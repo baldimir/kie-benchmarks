@@ -16,9 +16,12 @@
 
 package org.drools.benchmarks.dmn.feel;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.kie.dmn.feel.FEEL;
+import org.kie.dmn.feel.lang.CompiledExpression;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Measurement;
@@ -36,14 +39,25 @@ import org.openjdk.jmh.annotations.Warmup;
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 public abstract class AbstractFEELBenchmark {
 
-    private FEEL feelInstance;
+    private FEEL feelInterpreted;
+    private FEEL feelCompiled;
 
     @Setup(Level.Iteration)
     public void setupFEEL() {
-        feelInstance = FEEL.newInstance();
+
+        feelInterpreted = FEEL.newInstance();
+        feelCompiled = FEEL.newInstance(Collections.singletonList(new DoCompileFEELProfile()));
     }
 
     protected Object evaluateFEELExpression(final String expression) {
-        return feelInstance.evaluate(expression);
+        return feelInterpreted.evaluate(expression);
+    }
+
+    protected Object evaluateFEELExpression(final CompiledExpression expression) {
+        return feelCompiled.evaluate(expression, new HashMap<>());
+    }
+
+    protected CompiledExpression compileExpression(final String expression) {
+        return feelCompiled.compile(expression, PleasePutCompilerContextHere);
     }
 }

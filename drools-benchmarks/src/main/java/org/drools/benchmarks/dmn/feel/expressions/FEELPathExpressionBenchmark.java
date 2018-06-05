@@ -17,16 +17,30 @@
 package org.drools.benchmarks.dmn.feel.expressions;
 
 import org.drools.benchmarks.dmn.feel.AbstractFEELBenchmark;
+import org.kie.dmn.feel.lang.CompiledExpression;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Setup;
 
 public class FEELPathExpressionBenchmark extends AbstractFEELBenchmark {
 
     @Param({"{ full name: { first name: \"John\", last name: \"Doe\" } }.full name.last name"})
     private String expression;
 
+    private CompiledExpression compiledExpression;
+
+    @Setup
+    public void compileExpression() {
+        compiledExpression = compileExpression(expression);
+    }
+
     @Benchmark
     public Object evaluateExpressionBenchmark() {
         return evaluateFEELExpression(expression);
+    }
+
+    @Benchmark
+    public Object evaluateCompiledExpressionBenchmark() {
+        return evaluateFEELExpression(compiledExpression);
     }
 }
